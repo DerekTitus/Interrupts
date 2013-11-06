@@ -50,6 +50,8 @@ unsigned char movePlayer(unsigned char player, unsigned char direction);
 //
 char didPlayerWin(unsigned char player);
 
+char generateMines(unsigned char mines[NUM_MINES]);
+
 /*
  * Functions which may prove useful in achieving A-Functionality.
  *

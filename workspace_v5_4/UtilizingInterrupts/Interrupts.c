@@ -82,13 +82,26 @@ unsigned char movePlayer(unsigned char player, unsigned char direction)
         break;
 
 
-        			}
-        			        }
+
+  }
 
         return player;
 }
 
-char didPlayerWin(unsigned char player)
+
+char didPlayerWin(unsigned char player, char string1[], char string2[]);
 {
-        return player == 0xC7;
+		if (player == 0xc7)
+		{
+			LDCclear(); //program I forked
+			writeString(winstring1, 8);
+			cursorToLineTwo();
+			writeString(winstring2, 8);
+		}
+
 }
+
+
+
+        return player == 0xC7;
+        }

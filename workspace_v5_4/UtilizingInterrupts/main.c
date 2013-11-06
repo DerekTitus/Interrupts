@@ -36,6 +36,14 @@ void init_buttons()
 
 }
 
+char flag = 0;
+char winstring1[] = "YOU     ";
+char winstring2[] = "WIN!    ";
+char losestring1[] = "YOU     ";
+char losestring2[] = "LOSE!   ";
+char minestring1[] = "mine?   ";
+char minestring2[] = "press up";
+
 int main(void)
 {
         WDTCTL = (WDTPW|WDTHOLD);
@@ -45,9 +53,20 @@ int main(void)
         init_timer();
         init_buttons();
         __enable_interrupt();
+        initSPI();
+        LCDinit();
+
 
         while(1)
         {
+        	char mine1 = 0;
+        	char mine2 = 0;
+        	flag = 0; //for interrupt
+        	isGameOver = 1;
+        	LCDclear();
+        	TACTL &= ~(MC1|MC0);        // stop timer
+        	mine1 = generateMines(0,minestring1, minestring2);
+        	mine2 = generateMines(mine1, minestring1, minestring2);
                 /*
                  * while (game is on)
                  * {

@@ -59,19 +59,19 @@ int main(void)
 
         while(1)
         {
-        	char mine1 = 0;
-        	char mine2 = 0;
+//        	char mine1 = 0;
+//        	char mine2 = 0;
         	flag = 0; //for interrupt
         	isGameOver = 1;
         	LCDclear();
         	TACTL &= ~(MC1|MC0);        // stop timer
-        	mine1 = generateMines(0, minestring1, minestring2);
-        	mine2 = generateMines(mine1, minestring1, minestring2);
+   //     	mine1 = generateMines(0, minestring1, minestring2);
+  //      	mine2 = generateMines(mine1, minestring1, minestring2);
         	LCDclear();
-        	writeCommandByte(mine1);
-        	writeDataByte('X'); //puts an x where the mine1 is
-        	write CommandByte(mine2);
-        	writeDataByte('X');
+//        	writeCommandByte(mine1);
+//        	writeDataByte('X'); //puts an x where the mine1 is
+//        	write CommandByte(mine2);
+//        	writeDataByte('X');
         	TACTL |= MC1;
 
         	unsigned char player = initPlayer();
@@ -111,6 +111,8 @@ int main(void)
         			TAR = 0;
         			flag = 0;
         		}
+
+
 
         		}
 

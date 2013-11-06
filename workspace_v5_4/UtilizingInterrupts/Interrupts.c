@@ -90,7 +90,7 @@ unsigned char movePlayer(unsigned char player, unsigned char direction)
 
 // looked at C2C Busho's code and saw that he added more to this portion.
 // add char isGameOver and used a type of true false statement.
-char didPlayerWin(unsigned char player, char isGameOver, char string1[], char string2[]);
+char didPlayerWin(unsigned char player, char isGameOver, char winstring1[], char winstring2[]);
 {
 		if (player == 0xc7)
 		{
@@ -107,5 +107,4 @@ char didPlayerWin(unsigned char player, char isGameOver, char string1[], char st
 
 
 
-        return player == 0xC7;
-        }
+

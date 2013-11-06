@@ -43,6 +43,8 @@ char losestring1[] = "YOU     ";
 char losestring2[] = "LOSE!   ";
 char minestring1[] = "mine?   ";
 char minestring2[] = "press up";
+int isGameOver;
+
 
 int main(void)
 {
@@ -166,10 +168,10 @@ int main(void)
                  * wait for button press to begin new game (you can poll here)
                  * wait for release before starting again
                  */
-        }
 
-        return 0;
-}
+
+
+
 
 //
 // YOUR TIMER A ISR GOES HERE

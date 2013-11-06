@@ -34,7 +34,7 @@ unsigned char movePlayer(unsigned char player, unsigned char direction)
                 //
                 // update player position based on direction of movement
                 //
-        case RIGHT
+        case RIGHT:
         		clearPlayer(player);
         			player += 1;
         			if (player == 0x88)
@@ -47,24 +47,43 @@ unsigned char movePlayer(unsigned char player, unsigned char direction)
         			}
         			printPlayer(player);
         			waitForP1ButtonRelease(BIT1); //this function was taken from C2C Busho's code
-        			break;
-        case LEFT
+        break;
+        case LEFT:
         		clearPlayer(player);
         			player -= 1;
         			if (player == 0x7F)
         			{
         				player = 0x80;
         			}
-        			if (player == BF)
+        			if (player == 0xBF)
         			{
         				player = 0xC0;
         			}
         			printPlayer(player);
         			waitForP1ButtonRelease(BIT2); //bit2 is connected to left button
-        			break;
+        break;
         case UP:
+        		clearPlayer(player);
+        			if (player >= 0xC0) //if it is in the bottom line
+        			{
+        				player -= 0x40; //the difference between C and 8 is 4. This also keeps the horizontal placement the same
         			}
-        }
+        			printPlayer(player);
+        			waitForP1ButtonRelease(BIT3); //bit 3 is connected to up button
+        break;
+        case DOWN:
+        		clearPlayer(player);
+        			if (player <= 0x87)
+        			{
+        				player -= 0x40; //same as before, difference between C and 8 is 4.
+        			}
+        			printPlayer(player);
+        			waitForP1ButtonRelease(BIT4); //bit 4 is down button
+        break;
+
+
+        			}
+        			        }
 
         return player;
 }

@@ -5,7 +5,7 @@
 
 #include <msp430.h>
 #include "Interrupts.h"
-#include "button/buttons.h"
+#include "buttons/button.h"
 #include "LCD/LCD.h"
 
 void init_timer()
@@ -28,7 +28,7 @@ void init_timer()
 }
 
 
-}
+
 void init_buttons()
 {
 	P1IE |= BIT1|BIT2|BIT3;                 // enable the interrupts
@@ -65,8 +65,88 @@ int main(void)
         	isGameOver = 1;
         	LCDclear();
         	TACTL &= ~(MC1|MC0);        // stop timer
-        	mine1 = generateMines(0,minestring1, minestring2);
+        	mine1 = generateMines(0, minestring1, minestring2);
         	mine2 = generateMines(mine1, minestring1, minestring2);
+        	LCDclear();
+        	writeCommandByte(mine1);
+        	writeDataByte('X'); //puts an x where the mine1 is
+        	write CommandByte(mine2);
+        	writeDataByte('X');
+        	TACTL |= MC1;
+
+        	unsigned char player = initPlayer();
+        	char direction = 0;
+        	printPlayer(player);
+        	char release = 1;
+
+        	while (isGameOver)
+        	{
+        		if(isP1ButtonPressed(BIT1)) // Got help from Colin on this part and then used that knowledge to do the rest
+        		{
+        			direction = RIGHT;
+        			player = movePlayer(player, direction); // goes into the RIGHT interrupt
+        			TAR = 0;
+        			flag = 0; //reset the flag
+        		}
+        		if(isP1ButtonPressed(BIT2))
+        		{
+        			direction = LEFT;
+        			player = movePlayer(player, direction);
+        			TAR = 0;
+        			flag = 0;
+        		}
+
+        		if(isP1ButtonPressed(BIT3))
+        		{
+        			direction = UP;
+        			player = movePlayer(player, direction);
+        			TAR = 0;
+        			flag = 0;
+        		}
+
+        		if (isP1ButtonPressed(BIT4))
+        		{
+        			direction = DOWN;
+        			player = movePlayer(player, direction);
+        			TAR = 0;
+        			flag = 0;
+        		}
+
+        		}
+
+        	while (release)
+        		flag = 0;//need to clear the flag
+        	{
+        		if(isP1ButtonPressed(BIT1))
+        		{
+        			release = 0; //don't do anything until the button is no longer pressed
+        			ButtonRelease(BIT1);
+        		}
+
+        		if(isP1ButtonPressed(BIT2))
+        		{
+        			release = 0;
+        			ButtonRelease(BIT2);
+        		}
+
+        		if(isP1ButtonPressed(BIT3))
+        		{
+        			release = 0;
+        			ButtonRelease(BIT3);
+        		}
+
+        		if(isP1ButtonPressed(BIT4))
+        		{
+        			release = 0;
+        			ButtonRelease(BIT4);
+        		}
+
+        	}
+
+        	LCDclear();
+
+        		}
+        	}
                 /*
                  * while (game is on)
                  * {
@@ -93,12 +173,20 @@ int main(void)
 // YOUR TIMER A ISR GOES HERE
 //
 
-void init_timer()
+#pragma vector = TIMER_A_VECTOR
+__interrupt void TIMER_A_ISR()
 {
-        // do timer initialization work
+	TACTL &= ~TAIFG; //clear flag
+	flag += 1; //taken from Colin's code
+	if(flag == 4)
+	{
+		isGameOver = 0;
+		LCDclear();
+		writeString(losestring1, 8);
+		cursorToLineTwo();
+		writeString(losestring2, 8);
+	}
 }
 
-void init_buttons()
-{
-        // do button initialization work
-}
+
+

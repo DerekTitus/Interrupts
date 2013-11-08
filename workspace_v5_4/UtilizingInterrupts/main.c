@@ -32,8 +32,8 @@ void init_timer()
 void init_buttons()
 {
 	configureP1PinAsButton(BIT1|BIT2|BIT3|BIT4);
-	P1IE |= BIT1|BIT2|BIT3;                 // enable the interrupts
-	P1IES |= BIT1|BIT2|BIT3;                 // configure interrupt to sense falling edges
+	P1IE |= BIT1|BIT2|BIT3|BIT4;                 // enable the interrupts
+	P1IES |= BIT1|BIT2|BIT3|BIT4;                 // configure interrupt to sense falling edges
 	__enable_interrupt();
 }
 
@@ -44,17 +44,17 @@ char losestring1[] = "YOU     ";
 char losestring2[] = "LOSE!   ";
 char minestring1[] = "mine?   ";
 char minestring2[] = "press up";
-int isGameOver;
-int player;
-int direction;
-int release;
+char isGameOver;
+unsigned char player;
+char direction;
+char release;
 
 
 int main(void)
 {
         WDTCTL = (WDTPW|WDTHOLD);
 
-        unsigned char player = initPlayer();
+        player = initPlayer();
 
         init_timer();
         init_buttons();
@@ -73,7 +73,7 @@ int main(void)
         	TACTL |= MC1;
 
         	player = initPlayer();
-        	char direction = 0;
+        	direction = 0;
         	printPlayer(player);
         	release = 1;
 
@@ -87,17 +87,20 @@ int main(void)
         		writeString(winstring1);
         		cursorToLineTwo();
         		writeString(winstring2);
-        		__delay_cycles(10000000);
+        		__delay_cycles(1000000);
+        		flag = 0;
         	}
         }
 
+        }
 
+}
 //
 // YOUR TIMER A ISR GOES HERE
 //
 
 #pragma vector=TIMER0_A1_VECTOR
-__interrupt void Timer0_A1_ISR();
+__interrupt void Timer0_A1_ISR()
 {
 	TACTL &= ~TAIFG; //clear flag
 	flag += 1; //taken from Colin's code
@@ -108,11 +111,12 @@ __interrupt void Timer0_A1_ISR();
 		writeString(losestring1);
 		cursorToLineTwo();
 		writeString(losestring2);
+		__delay_cycles(1000000);
 	}
 }
 
 #pragma vector=PORT1_VECTOR
-__interrupt void Port_1_ISR(void);
+__interrupt void Port_1_ISR(void)
 {
 	if(P1IFG & BIT1) //are the flag and button down?
 	{
@@ -170,9 +174,9 @@ __interrupt void Port_1_ISR(void);
 
 		}
 
-		}
+	}
 
 
 
-        }
-}
+
+

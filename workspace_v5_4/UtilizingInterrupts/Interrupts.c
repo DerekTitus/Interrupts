@@ -78,7 +78,7 @@ unsigned char movePlayer(unsigned char player, unsigned char direction)
         		clearPlayer(player);
         			if (player <= 0x87)
         			{
-        				player -= 0x40; //same as before, difference between C and 8 is 4.
+        				player += 0x40; //same as before, difference between C and 8 is 4.
         			}
         			printPlayer(player);
         			waitForP1ButtonRelease(BIT4); //bit 4 is down button

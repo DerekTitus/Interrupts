@@ -9,7 +9,10 @@
 
 #include <msp430g2553.h>
 #include "Interrupts.h"
+#include "buttons/button.h"
+#include "LCD/LCD.h"
 
+char didPlayerWin(unsigned char player, char isGameOver, char*winstring1, char*winstring2);
 
 unsigned char initPlayer()
 {
@@ -88,21 +91,27 @@ unsigned char movePlayer(unsigned char player, unsigned char direction)
         return player;
 }
 
+
 // looked at C2C Busho's code and saw that he added more to this portion.
 // add char isGameOver and used a type of true false statement.
-char didPlayerWin(unsigned char player, char isGameOver, char winstring1[], char winstring2[]);
+char didPlayerWin(unsigned char player, char isGameOver, char*winstring1, char*winstring2)
 {
 		if (player == 0xc7)
 		{
 			isGameOver = 0;
 			LDCclear(); //program I forked
-			writeString(winstring1, 8);
+			writeString(winstring1);
 			cursorToLineTwo();
-			writeString(winstring2, 8);
+			writeString(winstring2);
+			__delay_cycles(1000000);
 		}
+		else{isGameOver = 1; }
 		return isGameOver;
 
 }
+
+
+
 
 
 

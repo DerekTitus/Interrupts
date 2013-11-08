@@ -31,9 +31,10 @@ void init_timer()
 
 void init_buttons()
 {
+	configureP1PinAsButton(BIT1|BIT2|BIT3|BIT4);
 	P1IE |= BIT1|BIT2|BIT3;                 // enable the interrupts
 	P1IES |= BIT1|BIT2|BIT3;                 // configure interrupt to sense falling edges
-
+	__enable_interrupt();
 }
 
 char flag = 0;
@@ -44,6 +45,9 @@ char losestring2[] = "LOSE!   ";
 char minestring1[] = "mine?   ";
 char minestring2[] = "press up";
 int isGameOver;
+int player;
+int direction;
+int release;
 
 
 int main(void)
@@ -61,124 +65,39 @@ int main(void)
 
         while(1)
         {
-//        	char mine1 = 0;
-//        	char mine2 = 0;
+        	player = 0;
         	flag = 0; //for interrupt
         	isGameOver = 1;
         	LCDclear();
         	TACTL &= ~(MC1|MC0);        // stop timer
-   //     	mine1 = generateMines(0, minestring1, minestring2);
-  //      	mine2 = generateMines(mine1, minestring1, minestring2);
-        	LCDclear();
-//        	writeCommandByte(mine1);
-//        	writeDataByte('X'); //puts an x where the mine1 is
-//        	write CommandByte(mine2);
-//        	writeDataByte('X');
         	TACTL |= MC1;
 
-        	unsigned char player = initPlayer();
+        	player = initPlayer();
         	char direction = 0;
         	printPlayer(player);
-        	char release = 1;
+        	release = 1;
 
-        	while (isGameOver)
+
+        while (isGameOver)
+        {
+        	if(player == 0xC7)
         	{
-        		if(isP1ButtonPressed(BIT1)) // Got help from Colin on this part and then used that knowledge to do the rest
-        		{
-        			direction = RIGHT;
-        			player = movePlayer(player, direction); // goes into the RIGHT interrupt
-        			TAR = 0;
-        			flag = 0; //reset the flag
-        		}
-        		if(isP1ButtonPressed(BIT2))
-        		{
-        			direction = LEFT;
-        			player = movePlayer(player, direction);
-        			TAR = 0;
-        			flag = 0;
-        		}
-
-        		if(isP1ButtonPressed(BIT3))
-        		{
-        			direction = UP;
-        			player = movePlayer(player, direction);
-        			TAR = 0;
-        			flag = 0;
-        		}
-
-        		if (isP1ButtonPressed(BIT4))
-        		{
-        			direction = DOWN;
-        			player = movePlayer(player, direction);
-        			TAR = 0;
-        			flag = 0;
-        		}
-
-
-
-        		}
-
-        	while (release)
-        		flag = 0;//need to clear the flag
-        	{
-        		if(isP1ButtonPressed(BIT1))
-        		{
-        			release = 0; //don't do anything until the button is no longer pressed
-        			ButtonRelease(BIT1);
-        		}
-
-        		if(isP1ButtonPressed(BIT2))
-        		{
-        			release = 0;
-        			ButtonRelease(BIT2);
-        		}
-
-        		if(isP1ButtonPressed(BIT3))
-        		{
-        			release = 0;
-        			ButtonRelease(BIT3);
-        		}
-
-        		if(isP1ButtonPressed(BIT4))
-        		{
-        			release = 0;
-        			ButtonRelease(BIT4);
-        		}
-
+        		isGameOver = 0;
+        		LCDclear();
+        		writeString(winstring1);
+        		cursorToLineTwo();
+        		writeString(winstring2);
+        		__delay_cycles(10000000);
         	}
-
-        	LCDclear();
-
-        		}
-        	}
-                /*
-                 * while (game is on)
-                 * {
-                 *                 check if button is pushed (you don't want to block here, so don't poll!)
-                 *                 if button is pushed:
-                 *                         clear current player marker
-                 *                         update player position based on direction
-                 *                         print new player
-                 *                         clear two second timer
-                 *                         wait for button release (you can poll here)
-                 * }
-                 *
-                 * print game over or you won, depending on game result
-                 *
-                 * wait for button press to begin new game (you can poll here)
-                 * wait for release before starting again
-                 */
-
-
-
+        }
 
 
 //
 // YOUR TIMER A ISR GOES HERE
 //
 
-#pragma vector = TIMER_A_VECTOR
-__interrupt void TIMER_A_ISR()
+#pragma vector=TIMER0_A1_VECTOR
+__interrupt void Timer0_A1_ISR();
 {
 	TACTL &= ~TAIFG; //clear flag
 	flag += 1; //taken from Colin's code
@@ -186,11 +105,74 @@ __interrupt void TIMER_A_ISR()
 	{
 		isGameOver = 0;
 		LCDclear();
-		writeString(losestring1, 8);
+		writeString(losestring1);
 		cursorToLineTwo();
-		writeString(losestring2, 8);
+		writeString(losestring2);
 	}
 }
 
+#pragma vector=PORT1_VECTOR
+__interrupt void Port_1_ISR(void);
+{
+	if(P1IFG & BIT1) //are the flag and button down?
+	{
+		if((isP1ButtonPressed(BIT1)) && (player != 0) && (isGameOver == 1))
+		{
+			direction = RIGHT;
+			player = movePlayer(player, direction);
+			TAR = 0;
+			flag = 0;
+		}
+
+		P1IFG &= ~BIT1; //clear the flag again
+
+	}
+
+	if(P1IFG & BIT2) //are the flag and button down?
+		{
+			if((isP1ButtonPressed(BIT2)) && (player != 0) && (isGameOver == 1))
+			{
+				direction = LEFT;
+				player = movePlayer(player, direction);
+				TAR = 0;
+				flag = 0;
+			}
+
+			P1IFG &= ~BIT2; //clear the flag again
+
+		}
+
+	if(P1IFG & BIT3) //are the flag and button down?
+		{
+			if((isP1ButtonPressed(BIT3)) && (player != 0) && (isGameOver == 1))
+			{
+				direction = UP;
+				player = movePlayer(player, direction);
+				TAR = 0;
+				flag = 0;
+			}
+
+			P1IFG &= ~BIT3; //clear the flag again
+
+		}
+
+	if(P1IFG & BIT4) //are the flag and button down?
+		{
+			if((isP1ButtonPressed(BIT4)) && (player != 0) && (isGameOver == 1))
+			{
+				direction = DOWN;
+				player = movePlayer(player, direction);
+				TAR = 0;
+				flag = 0;
+			}
+
+			P1IFG &= ~BIT4; //clear the flag again
+
+		}
+
+		}
 
 
+
+        }
+}

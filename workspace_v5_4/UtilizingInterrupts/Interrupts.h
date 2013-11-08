@@ -15,15 +15,12 @@
  * This is shell code for the game to be implemented in Lab 4.  It provides basic functions that may prove useful in accomplishing the lab.
  */
 
-
 #define UP 1
 #define DOWN 2
 #define LEFT 3
 #define RIGHT 4
 
 #define ROW_MASK 0x40
-
-#define NUM_MINES 2
 
 //
 // Initializes player to starting position on board.
@@ -48,7 +45,7 @@ unsigned char movePlayer(unsigned char player, unsigned char direction);
 //
 // Returns true if the position passed in is the winning game position.
 //
-char didPlayerWin(unsigned char player);
+char didPlayerWin(unsigned char player, char isGameOver, char*winstring1, char*winstring2);
 
 /*
  * Functions which may prove useful in achieving A-Functionality.
